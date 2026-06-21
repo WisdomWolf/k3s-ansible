@@ -32,6 +32,16 @@
     reload: true
   when: ansible_facts['all_ipv6_addresses'] | length > 0
 
+- name: Increase inotify limits for Kubernetes
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: true
+  loop:
+    - { name: fs.inotify.max_user_watches, value: "524288" }
+    - { name: fs.inotify.max_user_instances, value: "8192" }
+
 - name: Handle modern nftables/iptables-nft stack (Arch Linux 6.18+)
   when:
     - ansible_facts['distribution'] == 'Archlinux'
